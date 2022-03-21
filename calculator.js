@@ -26,4 +26,21 @@ const operate = (operator, a, b) => {
 // works
 
 // 3. create html buttons for digits and functions
+// done
 
+// 4. create functions that populate the display when numbers are clicked. use variable called 'display value';
+const digitButtons = document.querySelectorAll("button");
+const display = document.querySelector('.display')
+let displayValue = '';
+
+digitButtons.forEach(btn => {
+    btn.addEventListener("click", (event) => displayText(event))
+});
+
+function displayText(event) {
+    console.log("click!")
+    displayValue += event.target.innerHTML;
+    display.innerHTML = displayValue;   
+};
+
+// 5. make the calculator work, and display answer when '=' is pressed. 
