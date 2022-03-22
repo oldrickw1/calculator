@@ -1,3 +1,7 @@
+// operators ordered by order of operation
+const operators = ['/','*','-','+'];
+let remnant;
+
 // 1. Add functions
 const add = (a, b) => a + b;
 const subtract = (a, b) => a - b; 
@@ -12,6 +16,7 @@ const operate = (operator, a, b) => {
         return add(a,b)
     }
     else if (operator == '-'){
+        console.log("Operate function--- a =, b =",a,b);
         return subtract(a,b)
     }
     else if (operator == '*')
@@ -48,16 +53,22 @@ let result;
 const resultButton = document.querySelector('button.result');
 
 resultButton.addEventListener('click', () => {
+    console.log("resultString >", displayValue);
     result = displayValue.split(''); // step 1. string to array
+    console.log("resultArray >", result);
     result = concat(result); // step 2. concat integers if next to another
     result = minEval(result)// step 3. Evaluate for minus signs, -+ > -, if leading '-' in front of number > ,-number, 
-    let remnant;
     arrayWithRemnantAndResult = checkRemnant(result)// step 4. Check for trailing operator. Store it for next calculation
     remnant = arrayWithRemnantAndResult[0];
     result = arrayWithRemnantAndResult[1];
-    console.log(remnant, result); // store the value of remnant in a new global 'toBeCalculated' after result is done.
-    finalResult = evaluate(result); // TODO
-    displayValue = '' // reset display value
+    finalResult = evaluate(result); 
+    finalResultString = finalResult.toString();
+    if (remnant) {
+        finalResultString = finalResultString.concat(remnant);
+    }
+    displayValue = finalResultString;
+    console.log('Answer:',finalResultString);
+    display.innerHTML = finalResultString;
 })
 
 
@@ -99,7 +110,7 @@ function concat(arr){
     return newArr;
 }
 
-function minEval(arr){ // ----------------------buggy with rare cornercases--------------------
+function minEval(arr){ // ----------------------works--------------------
     let mincount =0;
     let tempArray = [];
     arr.push('');
@@ -188,57 +199,26 @@ function evaluate(arr) {
         return arr[0];
     }
     console.log(arr);
-    while (arr.includes('/')) {
-        for(let i = 0; i < arr.length; i++){
-            if (arr[i] == '/') {
-                partialAnswer = operate(arr[i],parseInt(arr[i - 1]), parseInt(arr[i + 1]));
-                tempArray.push(partialAnswer);
-                arr = tempArray.concat(arr.slice(i+2));
-                console.log("new arr = -------",arr);
-                break;
+
+    operators.forEach(symbol => {
+        while (arr.includes(symbol)) {
+            for(let i = 0; i < arr.length; i++){
+                if (arr[i] ==  symbol) {
+                    partialAnswer = operate(arr[i],parseFloat(arr[i - 1]), parseFloat(arr[i + 1]));
+                    console.log('partialAnswer: ',partialAnswer);
+                    tempArray.push(partialAnswer);
+                    console.log('tempArray: ',tempArray);
+                    arr.splice((i-1),3,partialAnswer);
+                    console.log("new arr = -------",arr);
+                    break;
+                }
             }
         }
-    }
-        
+    });
     console.log(partialAnswer);
-    while (arr.includes('*')) {
-        for(let i = 0; i < arr.length; i++){
-            if (arr[i] == '*') {
-                partialAnswer = operate(arr[i],parseInt(arr[i - 1]), parseInt(arr[i + 1]));
-                tempArray.push(partialAnswer);
-                arr = tempArray.concat(arr.slice(i+2));
-                console.log("new arr = -------",arr);
-                break;
-            }
-        }
-    }
-    console.log(partialAnswer);
-    while (arr.includes('-')) {
-        for(let i = 0; i < arr.length; i++){
-            if (arr[i] == '-') {
-                partialAnswer = operate(arr[i],parseInt(arr[i - 1]), parseInt(arr[i + 1]));
-                tempArray.push(partialAnswer);
-                arr = tempArray.concat(arr.slice(i+2));
-                console.log("new arr = -------",arr);
-                break;
-            }
-        }
-    }
-    console.log(partialAnswer);
-    while (arr.includes('+')) {
-        for(let i = 0; i < arr.length; i++){
-            if (arr[i] == '+') {
-                partialAnswer = operate(arr[i],parseInt(arr[i - 1]), parseInt(arr[i + 1]));
-                tempArray.push(partialAnswer);
-                arr = tempArray.concat(arr.slice(i+2));
-                console.log("new arr = -------",arr);
-                break;
-            }
-        }
-    }
-    console.log(partialAnswer);
+    let answer = Math.round(partialAnswer * 1000) / 1000;
+    console.log("FINAL ANSWER: ", answer);
     return partialAnswer;
-    
 }
 
 
